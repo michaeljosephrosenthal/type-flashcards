@@ -1,4 +1,4 @@
-Bottle Scaffold
+Type Flashcards
 ===============
 
-A base Bottle project with Jinja2, Twitter Bootstrap, Less.js and jQuery.
+Utility to practice Thai
