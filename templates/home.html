@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% for word in wordlist %}
+<form class="read form-horizontal">
+    <input type="hidden" name="answer" class="form-control" value="{{word.thai}}">
+    <div class="form-group">
+        <label class="col-sm-3 control-label">{{word.eng}}:</label>
+        <div class="col-sm-7">
+            <input type="text" name="read" class="form-control input-lg" >
+        </div>
+        <div class="retries">
+            <button class="btn btn-lg btn-danger">{{word.thai}}</button>
+            <button class="btn btn-lg btn-danger">{{word.thai}}</button>
+            <button class="btn btn-lg btn-danger">{{word.thai}}</button>
+        </div>
+        <button type="submit" class="btn btn-lg btn-primary">Enter</button>
+    </div>
+</form>
+{% endfor %}
+
+{% endblock %}
