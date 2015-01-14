@@ -26,7 +26,6 @@ with open("wordlist.txt", "r") as thai_words, open('wordlist.json', 'r+') as jso
             not in [ w["thai"] for w in translated ]
         ]
     for word in new_wordlist:
-        eng = trans(word)
         translated.append({
             "thai": word,
             "eng": trans(word)
