@@ -1,1 +1,1 @@
-web: python -m bottle main
+web: python -m bottle main -b localhost:$PORT
