@@ -9,7 +9,16 @@ window.speechSynthesis.onvoiceschanged = function() {
     kanya = speechSynthesis.getVoices().filter(
                 function(voice) { return voice.name == 'Kanya'; })[0];
 };
+var flash_time = 300;
+function flash(fclass){
+    clearTimeout();
+    $("html").addClass(fclass);
+    setTimeout(function () {
+        $("html").removeClass(fclass);
+    }, flash_time);
+}
 function add_success_scroll(selector){
+    flash("success");
     $(selector).addClass("success");
     $('html body').animate({
         scrollTop: $(selector).offset().top
@@ -17,12 +26,15 @@ function add_success_scroll(selector){
     $(selector).next().find('input[name="read"]').focus();
 }
 function correct_retry(selector, answer){
+    $(selector).addClass("warning");
     $(selector).find('input[name="read"]').val("");
-    $(selector).find(".retries .btn-danger::visible").first().hide();
+    $(selector).find(".retries .btn-danger:visible").first().hide();
+    flash("warning");
 }
 function wrong(selector){
     $(selector).find('input[name="read"]').val("");
     $(selector).addClass("danger");
+    flash("danger");
 }
 var retries = 0;
 $(document).ready(function(){
@@ -37,7 +49,7 @@ $(document).ready(function(){
         } else if (input == answer){
             add_success_scroll($form);
         } else {
-            retries = 2;
+            retries = retries > 0 ? retries : 2;
             wrong($form, answer);
         }
     });

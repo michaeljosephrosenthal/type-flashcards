@@ -1,7 +1,5 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
 import bottle
-from app import views
+from views import views
 
 @bottle.route('/assets/<filepath:path>')
 def server_static(filepath):

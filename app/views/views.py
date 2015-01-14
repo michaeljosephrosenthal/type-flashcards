@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from bottle import TEMPLATE_PATH, route, jinja2_template as template
-from models import *
+from bottle import TEMPLATE_PATH, route, jinja2_template as template, DEBUG
 import json, subprocess, random, os, io
 
 TEMPLATE_PATH.append('./templates')
@@ -37,4 +36,4 @@ def init_list():
 
 @route('/')
 def home():
-    return template('home.html', wordlist=init_list())
+    return template('home.html', wordlist=init_list(), DEV=DEBUG)
