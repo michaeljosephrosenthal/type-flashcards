@@ -21,7 +21,7 @@ body {
     max-width: 23cm;
     border: none;
     background-color: #073642;
-    margin: 2em auto;
+    margin: 4em auto;
     padding: 2em 1em;
 }
 .container, form, .form-group {
