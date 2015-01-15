@@ -51,7 +51,7 @@ function handle_guess(selector){
     var answer = $form.find('input[name="answer"]').val();
     var retries = parseInt($form.attr('retries'));
     speak(answer);
-    if(retries === 0 && input == answer){
+    if(retries <= 1 && input == answer){
         add_success_scroll($form);
     } else if (input == answer){
         correct_retry($form, answer, retries);
