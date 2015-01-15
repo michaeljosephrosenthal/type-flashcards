@@ -28,6 +28,7 @@ gulp.task('default', function() {
     // Watch files and run tasks if they change
     gulp.watch(less_srcs).on('change', function(file) {
         var changed = css_dir + path.basename(file.path).replace('less', 'css');        
+        console.log(changed);
         runSequence('compileLess', function(){            
             setTimeout(function(){
                 livereload.changed(changed, 35730);

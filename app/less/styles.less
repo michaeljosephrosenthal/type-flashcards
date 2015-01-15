@@ -27,9 +27,23 @@
 }
 .flasher-root {
     .flasher();
-    &.success, &.success .success .flasher { background-color: @success;   }
-    &.danger,  &.danger .danger .flasher { background-color: @danger;    }
-    &.warning, &.warning .warning .flasher { background-color: @warning; }
+
+    &.success,
+    &.success .success.flasher,
+    &.success .success .flasher {
+        background-color: @success!important;
+    }
+    &.warning,
+    &.warning .warning.flasher,
+    &.warning .warning .flasher {
+        background-color: @warning!important;
+    }
+
+    &.danger,
+    &.danger .danger.flasher,
+    &.danger .danger .flasher {
+        background-color: @danger!important;
+    }
 }
 
 html {
@@ -42,9 +56,6 @@ body {
     background-color: @base02;
     margin: 4em auto;
     padding: 2em 1em;
-}
-form {
-    border-radius: 6px;
 }
 .container, form, .form-group {
     max-width: 100%;
@@ -79,6 +90,12 @@ form.success {
         background-color: @base03!important;
         color: @cyan;
     }
+    &:first-of-type {
+        border-radius: 6px 6px 0 0;
+    }
+    &.last {
+        border-radius: 0 0 6px 6px;
+    }
 }
 
 label.control-label {
@@ -96,9 +113,23 @@ input.form-control {
 form:not(.danger) .retries {
     display: none;
 }
+
 .retries {
     position: absolute;
     right: 18.5%;
+    .three, .two {
+      display: none;
+      position: relative;
+      top: 0.2em;
+      font-size: 1.75em;
+      color: @red;
+    }
+    &.three {
+        .three {display : inline}
+    }
+    &.two:not(.three) {
+        .two {display : inline}
+    }
     .btn-danger {
         border-width: 2px;
         border-color: @red;

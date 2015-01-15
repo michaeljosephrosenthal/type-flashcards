@@ -18,17 +18,26 @@ function flash(fclass){
     }, flash_time);
 }
 function add_success_scroll(selector){
-    flash("success");
+    $(selector).prev().removeClass("last");
     $(selector).addClass("success");
+    flash("success");
     $('html body').animate({
         scrollTop: $(selector).offset().top
     }, 500);
     $(selector).next().find('input[name="read"]').focus();
 }
-function correct_retry(selector, answer){
+/*
+ * this part is confusing:
+ * start with 2 retries ->  remove the 'three' and add the 'two' class -> 2 more retries, etc.
+ */
+retry_classes = ["", "one", "two", "three"];
+var retries = 0;
+function correct_retry(selector, answer, retries){
     $(selector).addClass("warning");
     $(selector).find('input[name="read"]').val("");
-    $(selector).find(".retries .btn-danger:visible").first().hide();
+    $(selector).find(".retries")
+        .removeClass(retry_classes[retries])
+        .addClass( retries > 0 ? retry_classes[--retries] : "");
     flash("warning");
 }
 function wrong(selector){
@@ -36,21 +45,25 @@ function wrong(selector){
     $(selector).addClass("danger");
     flash("danger");
 }
-var retries = 0;
+function handle_guess(selector, answer, retries){
+    $form = $(selector);
+    input = $form.find('input[name="read"]').val();
+    answer = $form.find('input[name="answer"]').val();
+    retries = parseInt($form.attr('retries'));
+    speak(answer);
+    if(retries === 0 && input == answer){
+        add_success_scroll($form);
+    } else if (input == answer){
+        correct_retry($form, answer, retries);
+    } else {
+        retries = retries > 0 ? retries : $form.attr('retries', 3);
+        console.log($form.data('retries'));
+        wrong($form, answer);
+    }
+}
 $(document).ready(function(){
     $("form.read").submit(function(){
-        $form = $(this); event.preventDefault();
-        input = $form.find('input[name="read"]').val();
-        answer = $form.find('input[name="answer"]').val();
-        speak(answer);
-        if(retries > 0 && input == answer){
-            retries -= 1;
-            correct_retry($form, answer);
-        } else if (input == answer){
-            add_success_scroll($form);
-        } else {
-            retries = retries > 0 ? retries : 2;
-            wrong($form, answer);
-        }
+        event.preventDefault();
+        handle_guess(this);
     });
 });

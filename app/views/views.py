@@ -3,6 +3,9 @@
 from bottle import TEMPLATE_PATH, route, jinja2_template as template, DEBUG
 import json, subprocess, random, os, io
 
+def dev():
+    return os.environ.get("app_env", False) == "Dev"
+
 TEMPLATE_PATH.append('./templates')
 
 def trans(word):
@@ -37,4 +40,5 @@ def init_list():
 
 @route('/')
 def home():
-    return template('home.html', wordlist=init_list(), DEV=DEBUG)
+    print DEBUG
+    return template('home.html', wordlist=init_list(), DEV=dev())
