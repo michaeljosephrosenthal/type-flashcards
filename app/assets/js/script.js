@@ -30,14 +30,14 @@ function add_success_scroll(selector){
  * this part is confusing:
  * start with 2 retries ->  remove the 'three' and add the 'two' class -> 2 more retries, etc.
  */
-retry_classes = ["", "one", "two", "three"];
-var retries = 0;
+retry_classes = ["", "two", "three"];
 function correct_retry(selector, answer, retries){
     $(selector).addClass("warning");
     $(selector).find('input[name="read"]').val("");
     $(selector).find(".retries")
         .removeClass(retry_classes[retries])
-        .addClass( retries > 0 ? retry_classes[--retries] : "");
+        .addClass( retries > 0 ? retry_classes[--retries] : "")
+        .attr('retries', retries);
     flash("warning");
 }
 function wrong(selector){
@@ -45,19 +45,19 @@ function wrong(selector){
     $(selector).addClass("danger");
     flash("danger");
 }
-function handle_guess(selector, answer, retries){
+function handle_guess(selector){
     $form = $(selector);
-    input = $form.find('input[name="read"]').val();
-    answer = $form.find('input[name="answer"]').val();
-    retries = parseInt($form.attr('retries'));
+    var input = $form.find('input[name="read"]').val();
+    var answer = $form.find('input[name="answer"]').val();
+    var retries = parseInt($form.attr('retries'));
     speak(answer);
     if(retries === 0 && input == answer){
         add_success_scroll($form);
     } else if (input == answer){
         correct_retry($form, answer, retries);
     } else {
-        retries = retries > 0 ? retries : $form.attr('retries', 3);
-        console.log($form.data('retries'));
+        retries = retries > 0 ? retries : $form.attr('retries', 2);
+        //console.log($(form.data('retries').val()));
         wrong($form, answer);
     }
 }
