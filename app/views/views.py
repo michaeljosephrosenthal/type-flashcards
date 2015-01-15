@@ -40,5 +40,4 @@ def init_list():
 
 @route('/')
 def home():
-    print DEBUG
     return template('home.html', wordlist=init_list(), DEV=dev())
