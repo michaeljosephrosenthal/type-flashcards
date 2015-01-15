@@ -22,10 +22,11 @@
 @warning : darken(@yellow, 10);
 @success : darken(@cyan, 10);
 .flasher {
-    .lh-transition( background-color 0.1s ease-in-out );
+    .lh-translateZ(0);
+    .lh-transition( background-color 0.15s ease-in-out );
 }
 .flasher-root {
-    .lh-transition( background-color 0.2s ease-in-out );
+    .flasher();
     &.success, &.success .success .flasher { background-color: @success;   }
     &.danger,  &.danger .danger .flasher { background-color: @danger;    }
     &.warning, &.warning .warning .flasher { background-color: @warning; }

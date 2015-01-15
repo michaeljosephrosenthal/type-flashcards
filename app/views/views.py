@@ -31,6 +31,7 @@ def init_list():
                 "eng": trans(word)
                 })
         save_words(json_file, translated)
+        translated.reverse()
         return translated
     
 
