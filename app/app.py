@@ -1,4 +1,5 @@
-import bottle, os
+import bottle, os, sys, config
+from config import l
 from views import views
 
 @bottle.route('/assets/<filepath:path>')
@@ -7,9 +8,9 @@ def server_static(filepath):
 
 #run python -m bottle --debug --reload main
 if __name__ == "__main__":
-    os.chdir(os.path.dirname(os.path.realpath(__file__)))
-
-    DEV = os.environ.get("app_env", False) == "Dev"
-    print "Starting " + ("Development" if DEV else "Production") + " Server"
-
-    bottle.run(host='0.0.0.0', port=os.environ.get("PORT", 5000), debug=DEV, reloader=DEV)
+    if config.DEV and 'BOTTLE_CHILD' not in os.environ:
+        l.info('Using reloader, spawning first child.')
+    else:
+        l.info("Starting %s Server", ("Development" if config.DEV else "Production"))
+        os.chdir(os.path.dirname(os.path.realpath(__file__)))
+    bottle.run(host=config.HOST, port=config.PORT, debug=config.DEV, reloader=config.DEV)

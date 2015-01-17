@@ -56,8 +56,7 @@ function handle_guess(selector){
     } else if (input == answer){
         correct_retry($form, answer, retries);
     } else {
-        retries = retries > 0 ? retries : $form.attr('retries', 2);
-        //console.log($(form.data('retries').val()));
+        retries = retries === 0 ? retries : $form.attr('retries', 2);
         wrong($form, answer);
     }
 }

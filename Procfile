@@ -1,1 +1,1 @@
-web: `cd app; python app.py`
+web: python -u app/app.py
