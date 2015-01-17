@@ -36,8 +36,8 @@ function correct_retry(selector, answer, retries){
     $(selector).find('input[name="read"]').val("");
     $(selector).find(".retries")
         .removeClass(retry_classes[retries])
-        .addClass( retries > 0 ? retry_classes[--retries] : "")
-        .attr('retries', retries);
+        .addClass( retries > 0 ? retry_classes[--retries] : "");
+    $(selector).attr('retries', retries);
     flash("warning");
 }
 function wrong(selector){
@@ -51,7 +51,7 @@ function handle_guess(selector){
     var answer = $form.find('input[name="answer"]').val();
     var retries = parseInt($form.attr('retries'));
     speak(answer);
-    if(retries <= 1 && input == answer){
+    if(retries === 0 && input == answer){
         add_success_scroll($form);
     } else if (input == answer){
         correct_retry($form, answer, retries);
