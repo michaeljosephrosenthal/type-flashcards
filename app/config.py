@@ -1,4 +1,6 @@
 import os, logging
+import dj_database_url
+print dj_database_url
 
 DEV = os.environ.get("app_env", "Prod") == "Dev"
 HOST = '0.0.0.0'

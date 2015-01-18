@@ -1,4 +1,6 @@
 Jinja2==2.7
+MarkupSafe==0.23
 bottle==0.12.8
+bottle-sqlalchemy==0.4.1
+dj-database-url==0.3.0
 wsgiref==0.1.2
-

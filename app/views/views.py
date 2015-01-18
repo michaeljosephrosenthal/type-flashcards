@@ -1,7 +1,16 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from bottle import TEMPLATE_PATH, route, jinja2_template as template, DEBUG
-import json, subprocess, random, os, io, config
+import json, subprocess, random, os, io, config, psycopg2, urlparse
+
+url = urlparse.urlparse(os.environ["DATABASE_URL"])
+conn = psycopg2.connect(
+    database=url.path[1:],
+    user=url.username,
+    password=url.password,
+    host=url.hostname,
+    port=url.port
+)
 
 TEMPLATE_PATH.append('./templates')
 
