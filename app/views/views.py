@@ -1,7 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from bottle import TEMPLATE_PATH, route, jinja2_template as template, DEBUG
-import json, subprocess, random, os, io, config, psycopg2, urlparse
+# bottle deps
+from bottle import TEMPLATE_PATH, route, jinja2_template as template, request, redirect
+# Library deps
+import json, csv, subprocess, random, os, io, psycopg2, urlparse
+from psycopg2 import extras
+import config
 
 url = urlparse.urlparse(os.environ["DATABASE_URL"])
 conn = psycopg2.connect(
@@ -11,8 +15,30 @@ conn = psycopg2.connect(
     host=url.hostname,
     port=url.port
 )
+cur = conn.cursor(cursor_factory=extras.DictCursor)
 
 TEMPLATE_PATH.append('./templates')
+
+
+def get_cards():
+    cur.execute("select eng, thai from basic_card;")
+    cards = [{"eng": w["eng"], "thai": str(w["thai"]).rstrip().encode('utf-8')}
+             for w in cur.fetchall()]
+    for w in cards: print w['thai'] 
+    conn.commit()
+    return cards
+
+def create_card(thai, eng):
+    cur.execute("insert into basic_card (thai, eng) values (%(str)s, %(str)s);", (thai, eng))
+    conn.close()
+
+def load_words(thai_wordlist):
+    wordset = set(thai_wordlist)
+    raw = open("volubilis.tsv", "r")
+    volubilis = csv.DictReader(raw, delimiter='\t')
+    for row in volubilis:
+        if row["TH"] in wordset:
+            create_card(thai = row["TH"], eng = row["EN"])
 
 def trans(word):
     child = subprocess.Popen(['trans', '-b', word], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -43,7 +69,24 @@ def init_list():
         translated.reverse()
         return translated
     
+@route('/add')
+def add():
+    thai = request.query.get('thai')
+    eng = request.query.get('eng')
+    create_card(thai, eng)
+    redirect(request.query.get('redirect', "/eng/to/thai"))
+
 
 @route('/')
 def home():
-    return template('home.html', wordlist=init_list(), DEV=config.DEV)
+    redirect(request.query.get('redirect', "/eng/to/thai"))
+
+@route('/<first_lang>/to/<learning>')
+def cards(first_lang, learning):
+    context = {
+            "wordlist": get_cards(),
+            "DEV": config.DEV,
+            "known": first_lang,
+            "learning": learning
+            }
+    return template('home.html', **context)

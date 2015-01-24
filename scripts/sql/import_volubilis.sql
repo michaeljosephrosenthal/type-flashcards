@@ -15,4 +15,5 @@ create table volubilis_raw (
     DOM varchar default null
 );
 copy volubilis_raw from '/Users/mjr/Documents/code/type-flashcards/volubilis.tsv' with csv header delimiter E'\t' quote E'\b';
+create table basic_card (thai varchar, eng varchar);
 end;
