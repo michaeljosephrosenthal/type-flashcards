@@ -3,6 +3,7 @@
 {% block content %}
 
 {% for word in wordlist %}
+
 <form class="read form-horizontal flasher" retries=0 >
     <input type="hidden" name="answer" class="form-control" value="{{word.thai}}">
     <div class="form-group">
