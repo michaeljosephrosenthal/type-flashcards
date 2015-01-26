@@ -19,18 +19,16 @@ cur = conn.cursor(cursor_factory=extras.DictCursor)
 
 TEMPLATE_PATH.append('./templates')
 
-
 def get_cards():
-    cur.execute("select eng, thai from basic_card;")
-    cards = [{"eng": w["eng"], "thai": str(w["thai"]).rstrip().encode('utf-8')}
+    cur.execute("select * from basic_card;")
+    cards = [dict(w)
              for w in cur.fetchall()]
-    for w in cards: print w['thai'] 
     conn.commit()
     return cards
 
 def create_card(thai, eng):
-    cur.execute("insert into basic_card (thai, eng) values (%(str)s, %(str)s);", (thai, eng))
-    conn.close()
+    cur.execute("insert into basic_card (thai, eng) values (%(thai)s, %(eng)s);", {"thai": thai, "eng": eng})
+    conn.commit()
 
 def load_words(thai_wordlist):
     wordset = set(thai_wordlist)

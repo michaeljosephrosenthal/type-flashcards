@@ -2,6 +2,11 @@ import bottle, os, sys, config
 from config import l
 from views import views
 
+#Almost every page uses utf-8.
+#Now we don't have to worry about it
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 @bottle.route('/assets/<filepath:path>')
 def server_static(filepath):
     return bottle.static_file(filepath, root='assets')
