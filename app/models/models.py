@@ -16,13 +16,5 @@ class Word(Base):
     id = Column(Integer, primary_key=True)
     lang = Column(String)
     text = Column(String)
-    translations = relationship(
-            "Word",
-            foreign_keys="[Customer.billing_address_id]",
-            secondary       = "translation",
-            primaryjoin     = "Word.id==translation.c.word_a_id",
-            secondaryjoin   = "Word.id==translation.c.word_b_id",
-            backref="translated"
-            )
     def __repr__(self):
         return "<Word(lang='%s', text='%s')>" % (self.lang, self.text)
