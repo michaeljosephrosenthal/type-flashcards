@@ -4,31 +4,20 @@
 from bottle import TEMPLATE_PATH, route, jinja2_template as template, request, redirect
 # Library deps
 import json, csv, subprocess, random, os, io, psycopg2, urlparse
-from psycopg2 import extras
+from models.models import Word, Translation
+from sqlalchemy.orm import aliased
 import config
-
-url = urlparse.urlparse(os.environ["DATABASE_URL"])
-conn = psycopg2.connect(
-    database=url.path[1:],
-    user=url.username,
-    password=url.password,
-    host=url.hostname,
-    port=url.port
-)
-cur = conn.cursor(cursor_factory=extras.DictCursor)
 
 TEMPLATE_PATH.append('./templates')
 
-def get_cards():
-    cur.execute("select * from basic_card;")
-    cards = [dict(w)
-             for w in cur.fetchall()]
-    conn.commit()
-    return cards
-
-def create_card(thai, eng):
-    cur.execute("insert into basic_card (thai, eng) values (%(thai)s, %(eng)s);", {"thai": thai, "eng": eng})
-    conn.commit()
+def get_cards(known, learning, db):
+    second = aliased(Word)
+    q = db.query(Word.text, second.text).\
+            join(Translation, Word.id==Translation.word_a_id).\
+            join(second, second.id==Translation.word_b_id).\
+            filter(Word.lang==learning).\
+            filter(second.lang==known)
+    return [{learning: record[0], known: record[1]} for record in q]
 
 def load_words(thai_wordlist):
     wordset = set(thai_wordlist)
@@ -36,7 +25,7 @@ def load_words(thai_wordlist):
     volubilis = csv.DictReader(raw, delimiter='\t')
     for row in volubilis:
         if row["TH"] in wordset:
-            create_card(thai = row["TH"], eng = row["EN"])
+            add(thai = row["TH"], eng = row["EN"])
 
 def trans(word):
     child = subprocess.Popen(['trans', '-b', word], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -68,10 +57,16 @@ def init_list():
         return translated
     
 @route('/add')
-def add():
+def add(db):
     thai = request.query.get('thai')
     eng = request.query.get('eng')
-    create_card(thai, eng)
+    thai_word = Word(lang='thai', text=thai)
+    eng_word = Word(lang='eng', text=eng)
+    db.add_all([thai_word, eng_word])
+    db.commit()
+    translation = Translation(word_a_id=thai_word.id, word_b_id=eng_word.id, score=1)
+    db.add(translation)
+    db.commit()
     redirect(request.query.get('redirect', "/eng/to/thai"))
 
 
@@ -80,9 +75,9 @@ def home():
     redirect(request.query.get('redirect', "/eng/to/thai"))
 
 @route('/<first_lang>/to/<learning>')
-def cards(first_lang, learning):
+def cards(first_lang, learning, db):
     context = {
-            "wordlist": get_cards(),
+            "wordlist": get_cards(first_lang, learning, db),
             "DEV": config.DEV,
             "known": first_lang,
             "learning": learning
