@@ -3,7 +3,7 @@
 # bottle deps
 from bottle import TEMPLATE_PATH, route, jinja2_template as template, request, redirect
 # Library deps
-import json, csv, subprocess, random, os, io, psycopg2, urlparse, itertools, re
+import json, csv, subprocess, random, os, io, urlparse, itertools, re
 from models.models import Word, Translation
 from sqlalchemy.orm import aliased
 import config, db
@@ -36,19 +36,23 @@ def uniqify(seq):
    return checked
 
 def get_word_id(word):
+    session = db.create_session()
     record = session.query(Word.id).\
             filter(Word.lang==word.lang,
                    Word.text==word.text,
                    Word.category==word.category
                    ).first()
     word.id = record[0] if record else None
+    session.commit()
     return word
 
 def get_translation_id(translation):
+    session = db.create_session()
     record = session.query(Translation.id).\
             filter(Translation.word_a_id==translation.word_a_id,
                    Translation.word_b_id==translation.word_b_id
                    ).first()
+    session.commit()
     translation.id = record[0] if record else None
     return translation
 
