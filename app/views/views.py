@@ -3,9 +3,10 @@
 # bottle deps
 from bottle import TEMPLATE_PATH, route, jinja2_template as template, request, redirect
 # Library deps
-import json, csv, subprocess, random, os, io, psycopg2, urlparse, itertools, re
+import json, csv, subprocess, random, os, io, urlparse, itertools, re
 from models.models import Word, Translation
 from sqlalchemy.orm import aliased
+from sqlalchemy import or_, and_
 import config, db
 TEMPLATE_PATH.append('./templates')
 
@@ -13,10 +14,9 @@ def get_cards(known, learning):
     second = aliased(Word)
     session = db.create_session()
     q = session.query(Word.text, second.text, Translation.score).\
-            join(Translation, Word.id==Translation.word_a_id).\
-            join(second, second.id==Translation.word_b_id).\
-            filter(Word.lang==learning).\
-            filter(second.lang==known).\
+            join(Translation, or_(Word.id==Translation.word_a_id, Word.id==Translation.word_b_id)).\
+            join(second, or_(second.id==Translation.word_a_id, second.id==Translation.word_b_id)).\
+            filter(and_(Word.lang==learning, second.lang==known)).\
             order_by(Translation.score.desc())
     translation_dict = {}
     for record in q:

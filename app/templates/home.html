@@ -18,7 +18,7 @@
         </div>
         <button type="submit" class="btn btn-lg btn-primary">Enter</button>
         <ul class="col-sm-offset-3 list-inline alts">
-            {% for alt in word[known][-1:] %}
+            {% for alt in word[known][1:] %}
             <li><button class="btn btn-sm btn-default" type="button">{{alt}}</button></li>
             {% endfor %}
         </ul>
