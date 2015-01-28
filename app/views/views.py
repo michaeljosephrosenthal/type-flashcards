@@ -3,81 +3,122 @@
 # bottle deps
 from bottle import TEMPLATE_PATH, route, jinja2_template as template, request, redirect
 # Library deps
-import json, csv, subprocess, random, os, io, psycopg2, urlparse
+import json, csv, subprocess, random, os, io, psycopg2, urlparse, itertools, re
 from models.models import Word, Translation
 from sqlalchemy.orm import aliased
-import config
-
+import config, db
 TEMPLATE_PATH.append('./templates')
 
-def get_cards(known, learning, db):
+def get_cards(known, learning):
     second = aliased(Word)
-    q = db.query(Word.text, second.text).\
+    session = db.create_session()
+    q = session.query(Word.text, second.text, Translation.score).\
             join(Translation, Word.id==Translation.word_a_id).\
             join(second, second.id==Translation.word_b_id).\
             filter(Word.lang==learning).\
-            filter(second.lang==known)
-    return [{learning: record[0], known: record[1]} for record in q]
+            filter(second.lang==known).\
+            order_by(Translation.score.desc())
+    translation_dict = {}
+    for record in q:
+        if translation_dict.has_key(record[0]):
+            translation_dict[record[0]].append(record[1])
+        else:
+            translation_dict[record[0]] = [record[1]]
+    session.commit()
+    return [{learning: k, known: v} for k, v in translation_dict.items()]
+
+def uniqify(seq):
+   # order preserving
+   checked = []
+   for e in seq:
+       if e not in checked:
+           checked.append(e)
+   return checked
+
+def get_word_id(word):
+    record = session.query(Word.id).\
+            filter(Word.lang==word.lang,
+                   Word.text==word.text,
+                   Word.category==word.category
+                   ).first()
+    word.id = record[0] if record else None
+    return word
+
+def get_translation_id(translation):
+    record = session.query(Translation.id).\
+            filter(Translation.word_a_id==translation.word_a_id,
+                   Translation.word_b_id==translation.word_b_id
+                   ).first()
+    translation.id = record[0] if record else None
+    return translation
+
+def add_equal_wordlists(base_lang, category, **lang_to_lists):
+    session = db.create_session()
+    db_lists = dict()
+    for lang, wlist in lang_to_lists.items():
+        db_lists[lang] = [
+                get_word_id(Word(lang=lang, category=category, **w))
+                for w in uniqify(wlist)]
+        session.add_all([word for word in db_lists[lang] if word.id is None])
+    session.commit()
+    base_list = db_lists.pop(base_lang)
+    for llang, wlist in db_lists.items():
+        translations = [get_translation_id(
+            Translation(word_a_id=base.id,
+            word_b_id=target.id, score=1))
+         for base, target in itertools.product(base_list, wlist)]
+        session.add_all([t for t in translations if t.id is None])
+        session.commit()
+
+def vob_split(field, kind='word'):
+    if kind == 'word':
+        return re.split(r'\xc2\xa0; | ; ', field)
+    elif kind == 'category':
+        return re.split(r'\. *', field)[:-1]
+    else: return field
 
 def load_words(thai_wordlist):
     wordset = set(thai_wordlist)
     raw = open("volubilis.tsv", "r")
     volubilis = csv.DictReader(raw, delimiter='\t')
     for row in volubilis:
-        if row["TH"] in wordset:
-            add(thai = row["TH"], eng = row["EN"])
+        if set(row["TH"].split('\xc2\xa0; ')) & wordset:
+            thai_words = vob_split(row['TH'])
+            thai_phon = vob_split(row['THAIPHON'])
+            thai = [{"text": word, "pronunciation": phon}
+                    for word, phon in zip(thai_words, thai_phon)]
+            eng_words = [{"text": w} for w in vob_split(row['EN'])]
+            category = row['TYPE']
+            add_equal_wordlists('thai', category,
+                    thai = thai, eng = eng_words)
 
-def trans(word):
-    child = subprocess.Popen(['trans', '-b', word], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    eng = child.stdout.read().rstrip()
-    child.communicate('')
-    return eng
-
-def save_words(f, lst):
-    f.seek(0)
-    f.write(json.dumps(lst))
-    f.truncate()
-
-def init_list():
-    with open("wordlist.txt", "r") as thai_words, open('wordlist.json', 'r+') as json_file:
-        translated = json.load(json_file)
+def init_list(listfile):
+    with open(listfile, "r") as thai_words:
         new_wordlist = [
-                word.rstrip().decode('utf-8')
-                for word in thai_words.readlines()
-                if word.rstrip().decode('utf-8')
-                not in [ w["thai"] for w in translated ]
+                word.rstrip() for word in thai_words.readlines()
+                #if word.rstrip().decode('utf-8')
+                #not in [ w["thai"] for w in translated ]
             ]
-        for word in new_wordlist:
-            translated.append({
-                "thai": word,
-                "eng": trans(word)
-                })
-        save_words(json_file, translated)
-        translated.reverse()
-        return translated
+        load_words(new_wordlist)
     
 @route('/add')
-def add(db):
+def add(route_db):
     thai = request.query.get('thai')
+    phon = request.query.get('phon')
     eng = request.query.get('eng')
-    thai_word = Word(lang='thai', text=thai)
-    eng_word = Word(lang='eng', text=eng)
-    db.add_all([thai_word, eng_word])
-    db.commit()
-    translation = Translation(word_a_id=thai_word.id, word_b_id=eng_word.id, score=1)
-    db.add(translation)
-    db.commit()
+    category = request.query.get('cat')
+    add_equal_wordlists('thai', category,
+            thai = [{'text': thai, 'pronunciation': phon}], eng = [{'text': eng}])
     redirect(request.query.get('redirect', "/eng/to/thai"))
-
 
 @route('/')
 def home():
     redirect(request.query.get('redirect', "/eng/to/thai"))
 
 @route('/<first_lang>/to/<learning>')
-def cards(first_lang, learning, db):
+def cards(first_lang, learning, route_db):
     context = {
-            "wordlist": get_cards(first_lang, learning, db),
+            "wordlist": get_cards(first_lang, learning),
             "DEV": config.DEV,
             "known": first_lang,
             "learning": learning

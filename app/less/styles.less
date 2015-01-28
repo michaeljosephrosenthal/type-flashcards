@@ -71,13 +71,17 @@ body {
     padding-bottom: 7.5px;
 }
 
+.btn {
+    background: none;
+    &:hover { border-color: transparent; }
+}
 .btn-primary {
     border-color: @blue;
     color: @blue;
     border-width: 2px;
-    background: none;
-    &:hover { border-color: transparent; }
 }
+
+
 
 form.success {
     background-color: @base03;
@@ -103,6 +107,23 @@ label.control-label {
     font-size: 2em;
     color: @base0;
     bottom: 0.1em
+}
+.alts {
+    color: @base0;
+    margin-top: 0.5em;
+    padding-left: 0.75em;
+    li {
+        display: inline-block;
+        border-radius: 0 0 6px 6px;
+        border-color: @base0;
+        .btn-default {
+            padding: 2.5px 5px;
+            border-color: @base0;
+            color: @base0;
+            border-width: 1px;
+            &:hover { background-color: @base0; }
+        }
+    }
 }
 input.form-control {
     background-color: @base03;

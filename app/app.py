@@ -1,11 +1,10 @@
 import bottle, os, sys, config
 
 from bottle.ext import sqlalchemy
-from sqlalchemy import create_engine
 
 from config import l
 from views import views
-from models.models import Base
+from db import Base, engine
 
 #Almost every page uses utf-8.
 #Now we don't have to worry about it
@@ -13,12 +12,10 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 #Database init
-engine = create_engine(config.DATABASE_URL, echo=True)
-if config.INIT_DB: Base.metadata.create_all(engine)
 plugin = sqlalchemy.Plugin(
     engine,
     Base.metadata, # required only if create=True
-    keyword='db',  # injected into session routes
+    keyword='route_db',  # injected into session routes
     commit=True    # commit changes after route is executed
 )
 bottle.install(plugin)

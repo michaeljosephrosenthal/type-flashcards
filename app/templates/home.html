@@ -7,7 +7,7 @@
 <form class="read form-horizontal flasher" retries=0 >
     <input type="hidden" name="answer" class="form-control" value="{{word[learning]}}">
     <div class="form-group">
-        <label class="col-sm-3 control-label">{{word[known]}}:</label>
+        <label class="col-sm-3 control-label">{{word[known][0]}}:</label>
         <div class="col-sm-7">
             <input type="text" name="read" class="form-control input-lg flasher" autocomplete="off">
         </div>
@@ -17,6 +17,11 @@
             <button class="btn btn-lg btn-danger flasher">{{word[learning]}}</button>
         </div>
         <button type="submit" class="btn btn-lg btn-primary">Enter</button>
+        <ul class="col-sm-offset-3 list-inline alts">
+            {% for alt in word[known][-1:] %}
+            <li><button class="btn btn-sm btn-default" type="button">{{alt}}</button></li>
+            {% endfor %}
+        </ul>
     </div>
 </form>
 {% endfor %}
