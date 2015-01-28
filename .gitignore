@@ -4,3 +4,4 @@
 .env
 env/
 .c9/
+*.log
