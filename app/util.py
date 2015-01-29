@@ -1,4 +1,5 @@
 import itertools
+
 def uniqify(seq):
    # order preserving
    checked = []
