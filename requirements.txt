@@ -1,7 +1,9 @@
 Beaker==1.6.4
 Jinja2==2.7
+Mako==1.0.1
 MarkupSafe==0.23
 SQLAlchemy==0.9.8
+alembic==0.7.4
 bottle==0.12.8
 bottle-cork==0.11.1
 bottle-sqlalchemy==0.4.1
