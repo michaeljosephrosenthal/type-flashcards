@@ -8,6 +8,7 @@ from models.models import Word, Translation
 from sqlalchemy.orm import aliased
 from sqlalchemy import or_, and_
 import config, db
+from util import uniqify
 TEMPLATE_PATH.append('./templates')
 
 def get_cards(known, learning):
@@ -26,14 +27,6 @@ def get_cards(known, learning):
             translation_dict[record[0]] = [record[1]]
     session.commit()
     return [{learning: k, known: v} for k, v in translation_dict.items()]
-
-def uniqify(seq):
-   # order preserving
-   checked = []
-   for e in seq:
-       if e not in checked:
-           checked.append(e)
-   return checked
 
 def get_word_id(word):
     session = db.create_session()
