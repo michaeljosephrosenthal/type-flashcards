@@ -1,0 +1,15 @@
+{% macro input(name, placeholder, class="", type="text") %}
+    <div class="form-group {{class}}">
+        <input name="{{name}}" type="{{type}}" class="form-control" placeholder="{{placeholder}}"
+            {% for k,v in kwargs.iteritems() %} {{k}}="{{v}}" {% endfor %} />
+        {{ caller() if caller is defined }}
+    </div>
+{% endmacro %}
+{% macro textarea(name, placeholder, class="", type="text") %}
+    <div class="form-group {{class}}">
+        <textarea name="{{name}}" type="{{type}}" class="form-control" placeholder="{{placeholder}}"
+            {% for k,v in kwargs.iteritems() %} {{k}}="{{v}}" {% endfor %}></textarea>
+        {{ caller() if caller is defined }}
+    </div>
+{% endmacro %}
+

@@ -1,10 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 # bottle deps
-from bottle import TEMPLATE_PATH, route, jinja2_template as template, request, redirect
+import bottle
+from bottle import TEMPLATE_PATH, route, post, put, get, delete, jinja2_template as template, request, redirect
 # Library deps
 import json, csv, subprocess, random, os, io, urlparse, itertools, re
-from models.models import Word, Translation
+from StringIO import StringIO
+from models.models import Word, Translation, WordList, WordListItem
 from sqlalchemy.orm import aliased
 from sqlalchemy import or_, and_
 import config, db
@@ -28,43 +30,32 @@ def get_cards(known, learning):
     session.commit()
     return [{learning: k, known: v} for k, v in translation_dict.items()]
 
-def get_word_id(word):
+def add_translations(words):
     session = db.create_session()
-    record = session.query(Word.id).\
-            filter(Word.lang==word.lang,
-                   Word.text==word.text,
-                   Word.category==word.category
-                   ).first()
-    word.id = record[0] if record else None
+    translations = []
+    for word in words:
+        cat = word.pop('category')
+        synced_words = []
+        for lang, text in word.items():
+            synced_words.append(Word(lang=lang, category=cat, text=text).sync_with(session))
+        session.commit()
+        translations.append(Translation(*[w.id for w in synced_words], score=1).sync_with(session))
     session.commit()
-    return word
+    return translations
 
-def get_translation_id(translation):
-    session = db.create_session()
-    record = session.query(Translation.id).\
-            filter(Translation.word_a_id==translation.word_a_id,
-                   Translation.word_b_id==translation.word_b_id
-                   ).first()
-    session.commit()
-    translation.id = record[0] if record else None
-    return translation
 
 def add_equal_wordlists(base_lang, category, **lang_to_lists):
     session = db.create_session()
     db_lists = dict()
     for lang, wlist in lang_to_lists.items():
         db_lists[lang] = [
-                get_word_id(Word(lang=lang, category=category, **w))
+                Word(lang=lang, category=category, **w).sync_with(session)
                 for w in uniqify(wlist)]
-        session.add_all([word for word in db_lists[lang] if word.id is None])
     session.commit()
     base_list = db_lists.pop(base_lang)
     for llang, wlist in db_lists.items():
-        translations = [get_translation_id(
-            Translation(word_a_id=base.id,
-            word_b_id=target.id, score=1))
-         for base, target in itertools.product(base_list, wlist)]
-        session.add_all([t for t in translations if t.id is None])
+        translations = [Translation(base.id, target.id, score=1).sync_with(session)
+                for base, target in itertools.product(base_list, wlist)]
         session.commit()
 
 def vob_split(field, kind='word'):
@@ -118,6 +109,18 @@ def cards(first_lang, learning, route_db):
             "wordlist": get_cards(first_lang, learning),
             "DEV": config.DEV,
             "known": first_lang,
-            "learning": learning
-            }
-    return template('home.html', **context)
+            "learning": learning }
+    return template('type.html', **context)
+
+@get('/create/wordlist')
+def cwl():
+    return template('add_wordlist.html')
+
+@post('/create/wordlist')
+def create_wordlist(route_db):
+    form = dict(request.forms)
+    header = [form['from'], form['to'], 'category']
+    words = csv.DictReader(StringIO(form['words']), header, delimiter=form['delimiter'])
+    translations = add_translations(list(w.rstrip() for w in words))
+    lst = WordList(form['name'], translations, route_db)
+    redirect("/".join(['', lst.name, form['from'], 'to', form['to']]))

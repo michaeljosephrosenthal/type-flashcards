@@ -1,0 +1,42 @@
+body.practice {
+    input.form-control {
+        font-size: 2em;
+    }
+    form:not(.danger) .retries {
+        display: none;
+    }
+    .alts {
+        margin-top: 0.5em;
+        padding-left: 0.75em;
+        li {
+            display: inline-block;
+            border-radius: 0 0 6px 6px;
+            .btn-default {
+                padding: 2.5px 5px;
+                border-width: 1px;
+                &:hover {
+                }
+            }
+        }
+    }
+    .retries {
+        position: absolute;
+        right: 18.5%;
+        .three, .two {
+            display: none;
+            position: relative;
+            top: 0.2em;
+            font-size: 1.75em;
+        }
+        &.three {
+            .three {display : inline}
+        }
+        &.two {
+            .two {display : inline}
+        }
+        .btn-danger {
+            border-width: 2px;
+        }
+    }
+
+}

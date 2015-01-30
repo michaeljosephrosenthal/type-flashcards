@@ -1,22 +1,8 @@
 @import "vendor/bootstrap/bootstrap.less";
 @import "vendor/lesshat-prefixed.less";
-
-@base03 :  #002b36;
-@base02 :  #073642;
-@base01 :  #586e75;
-@base00 :  #657b83;
-@base0  :  #839496;
-@base1  :  #93a1a1;
-@base2  :  #eee8d5;
-@base3  :  #fdf6e3;
-@yellow :  #b58900;
-@orange :  #cb4b16;
-@red    :  #dc322f;
-@magenta:  #d33682;
-@violet :  #6c71c4;
-@blue   :  #268bd2;
-@cyan   :  #2aa198;
-@green  :  #859900;
+@import "colorscheme/solarized.less";
+@import "namespace/practice.less";
+@import "namespace/create.less";
 
 @danger : darken(@red, 10);
 @warning : darken(@yellow, 10);
@@ -66,7 +52,6 @@ body {
     margin-left: 15px;
     margin-right: 15px;
     margin-bottom: 0px;
-
     padding-top: 7.5px;
     padding-bottom: 7.5px;
 }
@@ -108,58 +93,10 @@ label.control-label {
     color: @base0;
     bottom: 0.1em
 }
-.alts {
-    color: @base0;
-    margin-top: 0.5em;
-    padding-left: 0.75em;
-    li {
-        display: inline-block;
-        border-radius: 0 0 6px 6px;
-        border-color: @base0;
-        .btn-default {
-            padding: 2.5px 5px;
-            border-color: @base0;
-            color: @base0;
-            border-width: 1px;
-            &:hover {
-                background-color: @base0;
-                color: @base02;
-            }
-        }
-    }
-}
-input.form-control {
-    background-color: @base03;
+input.form-control, textarea.form-control {
     border: none;
     box-shadow: none;
-    font-size: 2em;
-    color:  @base3;
-}
-form:not(.danger) .retries {
-    display: none;
-}
-
-.retries {
-    position: absolute;
-    right: 18.5%;
-    .three, .two {
-      display: none;
-      position: relative;
-      top: 0.2em;
-      font-size: 1.75em;
-      color: @red;
-    }
-    &.three {
-        .three {display : inline}
-    }
-    &.two {
-        .two {display : inline}
-    }
-    .btn-danger {
-        border-width: 2px;
-        border-color: @red;
-        background-color: @red;
-        color: @base3;
+    &::-webkit-input-placeholder, &:-moz-placeholder, &::-moz-placeholder {
+        opacity: 0.5; //I don't konw why this isn't working
     }
 }
-
