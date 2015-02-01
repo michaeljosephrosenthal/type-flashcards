@@ -30,6 +30,25 @@ def get_cards(known, learning):
     session.commit()
     return [{learning: k, known: v} for k, v in translation_dict.items()]
 
+def get_wordlist_cards(name, known, learning):
+    second = aliased(Word)
+    session = db.create_session()
+    q = session.query(Word.text, second.text, Translation.score).\
+            join(Translation, Word.id==Translation.word_a_id).\
+            join(WordListItem, Translation.id==WordListItem.translation_id).\
+            join(WordList, WordList.id==WordListItem.wordlist_id).\
+            join(second, second.id==Translation.word_b_id).\
+            filter(and_(name == WordList.name,and_(Word.lang==learning, second.lang==known))).\
+            order_by(Translation.score.desc())
+    translation_dict = {}
+    for record in q:
+        if translation_dict.has_key(record[0]):
+            translation_dict[record[0]].append(record[1])
+        else:
+            translation_dict[record[0]] = [record[1]]
+    session.commit()
+    return [{learning: k, known: v} for k, v in translation_dict.items()]
+
 def add_translations(words):
     session = db.create_session()
     translations = []
@@ -112,6 +131,16 @@ def cards(first_lang, learning, route_db):
             "learning": learning }
     return template('type.html', **context)
 
+
+@route('/wordlist/<name>/<known>/to/<learning>')
+def wordlist_cards(name, known, learning, route_db):
+    context = {
+            "wordlist": get_wordlist_cards(name,known,learning),
+            "DEV": config.DEV,
+            "known": known,
+            "learning": learning }
+    return template('type.html', **context)
+
 @get('/create/wordlist')
 def cwl():
     return template('add_wordlist.html')
@@ -119,8 +148,9 @@ def cwl():
 @post('/create/wordlist')
 def create_wordlist(route_db):
     form = dict(request.forms)
+    print form
     header = [form['from'], form['to'], 'category']
     words = csv.DictReader(StringIO(form['words']), header, delimiter=form['delimiter'])
-    translations = add_translations(list(w.rstrip() for w in words))
+    translations = add_translations(list(words))
     lst = WordList(form['name'], translations, route_db)
     redirect("/".join(['', lst.name, form['from'], 'to', form['to']]))

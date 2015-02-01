@@ -69,8 +69,8 @@ class Word(Default, Base):
     __table_args__ = (UniqueConstraint(lang, text, category),)
 
 class WordListItem(Default, Base):
-    wordlist_id = Column(Integer, ForeignKey('translation.id'))
-    translation_id = Column(Integer, ForeignKey('wordlist.id'))
+    wordlist_id = Column(Integer, ForeignKey('wordlist.id'))
+    translation_id = Column(Integer, ForeignKey('translation.id'))
     __table_args__ = (UniqueConstraint(wordlist_id, translation_id),)
 
 class WordList(Default, Base):
@@ -82,4 +82,3 @@ class WordList(Default, Base):
         session.add_all([WordListItem(wordlist_id = self.id, translation_id = t.id)
             for t in translations])
         session.commit()
-        return self
