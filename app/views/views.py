@@ -6,7 +6,7 @@ from bottle import TEMPLATE_PATH, route, post, put, get, delete, jinja2_template
 # Library deps
 import json, csv, subprocess, random, os, io, urlparse, itertools, re
 from StringIO import StringIO
-from models.models import Word, Translation, WordList, WordListItem
+from models import Word, Translation, WordList, WordListItem
 from sqlalchemy.orm import aliased
 from sqlalchemy import or_, and_
 import config, db
@@ -34,23 +34,8 @@ def get_cards(known, learning):
 def get_wordlist_cards(name, known, learning):
     second = aliased(Word)
     session = db.create_session()
-    q = session.query(Word.text, second.text, Translation.score).\
-            join(Translation, or_(Word.id==Translation.word_a_id, Word.id==Translation.word_b_id)).\
-            join(second, or_(second.id==Translation.word_a_id, second.id==Translation.word_b_id)).\
-            join(WordListItem, Translation.id==WordListItem.translation_id).\
-            join(WordList, WordList.id==WordListItem.wordlist_id).\
-            filter(name == WordList.name,
-                   Word.lang==learning,
-                   second.lang==known).\
-            order_by(Translation.score.desc())
-    translation_dict = {}
-    for record in q:
-        if translation_dict.has_key(record[0]):
-            translation_dict[record[0]].append(record[1])
-        else:
-            translation_dict[record[0]] = [record[1]]
-    session.commit()
-    return [{learning: k, known: v} for k, v in translation_dict.items()]
+    wordlist = session.query(WordList).filter(WordList.name == name).one().materialize()
+    return wordlist
 
 def add_translations(words):
     session = db.create_session()
@@ -137,8 +122,11 @@ def cards(first_lang, learning, route_db):
 
 @route('/wordlist/<name>/<known>/to/<learning>')
 def wordlist_cards(name, known, learning, route_db):
+    lst = get_wordlist_cards(name,known,learning)
     context = {
-            "wordlist": get_wordlist_cards(name,known,learning),
+            "wordlist": lst['items'],
+            "multi": False,
+            "name": lst['name'],
             "DEV": config.DEV,
             "known": known,
             "learning": learning }
@@ -151,7 +139,6 @@ def cwl():
 @post('/create/wordlist')
 def create_wordlist(route_db):
     form = dict(request.forms)
-    print form
     header = [form['from'], form['to'], 'category']
     words = csv.DictReader(StringIO(form['words']), header, delimiter=form['delimiter'])
     translations = add_translations(list(words))
