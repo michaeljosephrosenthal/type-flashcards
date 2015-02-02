@@ -19,7 +19,8 @@ def get_cards(known, learning):
     q = session.query(Word.text, second.text, Translation.score).\
             join(Translation, or_(Word.id==Translation.word_a_id, Word.id==Translation.word_b_id)).\
             join(second, or_(second.id==Translation.word_a_id, second.id==Translation.word_b_id)).\
-            filter(and_(Word.lang==learning, second.lang==known)).\
+            filter(Word.lang==learning,
+                   second.lang==known).\
             order_by(Translation.score.desc())
     translation_dict = {}
     for record in q:
@@ -34,11 +35,13 @@ def get_wordlist_cards(name, known, learning):
     second = aliased(Word)
     session = db.create_session()
     q = session.query(Word.text, second.text, Translation.score).\
-            join(Translation, Word.id==Translation.word_a_id).\
+            join(Translation, or_(Word.id==Translation.word_a_id, Word.id==Translation.word_b_id)).\
+            join(second, or_(second.id==Translation.word_a_id, second.id==Translation.word_b_id)).\
             join(WordListItem, Translation.id==WordListItem.translation_id).\
             join(WordList, WordList.id==WordListItem.wordlist_id).\
-            join(second, second.id==Translation.word_b_id).\
-            filter(and_(name == WordList.name,and_(Word.lang==learning, second.lang==known))).\
+            filter(name == WordList.name,
+                   Word.lang==learning,
+                   second.lang==known).\
             order_by(Translation.score.desc())
     translation_dict = {}
     for record in q:
@@ -122,12 +125,12 @@ def add(route_db):
 def home():
     redirect(request.query.get('redirect', "/eng/to/thai"))
 
-@route('/<first_lang>/to/<learning>')
+@route('/<known>/to/<learning>')
 def cards(first_lang, learning, route_db):
     context = {
-            "wordlist": get_cards(first_lang, learning),
+            "wordlist": get_cards(known, learning),
             "DEV": config.DEV,
-            "known": first_lang,
+            "known": known,
             "learning": learning }
     return template('type.html', **context)
 
@@ -153,4 +156,4 @@ def create_wordlist(route_db):
     words = csv.DictReader(StringIO(form['words']), header, delimiter=form['delimiter'])
     translations = add_translations(list(words))
     lst = WordList(form['name'], translations, route_db)
-    redirect("/".join(['', lst.name, form['from'], 'to', form['to']]))
+    redirect("/".join(['', 'wordlist', lst.name, form['from'], 'to', form['to']]))

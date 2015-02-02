@@ -33,7 +33,8 @@ class Default(object):
     def sync_with(self, session):
         self.id = session.query(getattr(self.__class__, "id")).\
                 filter(*self.__unique_filters__).scalar()
-        session.merge(self)
+        if self.id: session.merge(self)
+        else: session.add(self)
         return self
 
     def persist(self, session):
