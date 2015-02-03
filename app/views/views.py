@@ -111,9 +111,10 @@ def home():
     redirect(request.query.get('redirect', "/eng/to/thai"))
 
 @route('/<known>/to/<learning>')
-def cards(first_lang, learning, route_db):
+def cards(known, learning, route_db):
     context = {
             "wordlist": get_cards(known, learning),
+            "multi": True,
             "DEV": config.DEV,
             "known": known,
             "learning": learning }
