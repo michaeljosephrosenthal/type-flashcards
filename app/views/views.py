@@ -125,7 +125,7 @@ def cards(known, learning, route_db):
 def wordlist_cards(name, known, learning, route_db):
     lst = get_wordlist_cards(name,known,learning)
     context = {
-            "wordlist": lst['items'],
+            "wordlist": sorted(lst['items']),
             "multi": False,
             "name": lst['name'],
             "DEV": config.DEV,
