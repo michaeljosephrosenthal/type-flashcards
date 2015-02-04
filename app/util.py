@@ -10,3 +10,4 @@ def uniqify(seq):
 
 def flatten(lst):
     return itertools.chain.from_iterable(lst)
+

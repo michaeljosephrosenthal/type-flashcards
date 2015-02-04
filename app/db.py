@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 import config 
 
-from models import Base, Word, Translation
+from models import Base
 
 engine = create_engine(config.DATABASE_URL, echo=False)
 if config.INIT_DB: Base.metadata.create_all(engine)
