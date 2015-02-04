@@ -16,8 +16,8 @@ fileConfig(config.config_file_name)
 import os, sys
 sys.path.append(os.getcwd())
 from app import db
-from app.models import models
-target_metadata = models.Base.metadata
+from app.models import Base
+target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
