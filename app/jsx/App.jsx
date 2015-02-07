@@ -42,8 +42,3 @@ var App = React.createClass({
 });
 
 module.exports = App;
-/*
-   var Router = require('react-router');
-   var RouteHandler = Router.RouteHandler;
-   <RouteHandler/>
-   */
