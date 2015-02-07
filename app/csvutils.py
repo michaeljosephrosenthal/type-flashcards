@@ -47,5 +47,6 @@ def import_words(listfile):
 if __name__ == "__main__":
     reload(sys)
     sys.setdefaultencoding('utf-8')
-    listfile = sys.argv[0]
+    listfile = sys.argv[1]
+    print "importing words from " + listfile
     import_words(listfile)
