@@ -18,6 +18,9 @@
     <script src="//code.jquery.com/jquery-2.1.3.min.js"defer></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"defer></script>
     <script src="/assets/js/script.js" defer></script>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.12.2/react.js"defer></script>
     {% if DEV %}
         {#% for path in assets.css.shared + assets.css.public %}
             <link href="{{ get_static_path(path, 'css') }}" rel="stylesheet">
@@ -26,51 +29,15 @@
     {% endif %}   
   </head>
 
-  <body class="{{ namespace }} cs-{{ colorscheme }}">
-
-  <!--
-    <div class="navbar navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container">
-          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </a>
-          <a class="brand" href="#">Project name</a>
-          <div class="nav-collapse">
-            <ul class="nav">
-              <li class="active"><a href="#">Home</a></li>
-              <li><a href="#about">About</a></li>
-              <li><a href="#contact">Contact</a></li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-    -->
-
-    <div class="container">
-      <nav class="navbar navbar-default">
-      <div class="container-fluid">
-        <div class="navbar-header">
-          <a class="navbar-brand" href="/">WebSiteName</a>
-        </div>
-        <div>
-          <ul class="nav navbar-nav">
-            <li class="active"><a href="/">Home</a></li>
-            <li><a href="/thai/to/eng">Thai to English</a></li>
-            <li><a href="/eng/to/thai">English to Thai</a></li> 
-            <li><a href="/create/wordlist">Word list</a></li> 
-          </ul>
-        </div>
-      </div>
-    </nav>
-        {% block content %}
-            <h1>Bootstrap starter template</h1>
-            <p>Use this document as a way to quick start any new project.<br> All you get is this message and a barebones HTML document.</p>
-        {% endblock %}
-    </div>
-
+  <body class="{{ namespace or "practice" }} cs-{{ colorscheme or "solarized" }}">
+    {% block content %}
+        <script>
+            var known = "{{known}}";
+            var learning = "{{learning}}";
+            var activePath = "{{ "/" + known + '/to/' + learning }}";
+        </script>
+        <div id="app"></div>
+        <script src="/assets/js/app.js" defer></script>
+    {% endblock %}
   </body>
 </html>

@@ -3,31 +3,31 @@
 {% extends "base.html" %}
 
 {% block content %}
-
-{% for word in wordlist %}
-
-<form class="read form-horizontal flasher" retries=0 >
-    <input type="hidden" name="answer" class="form-control" value="{{word[learning]}}">
-    <div class="form-group">
-        <label class="col-sm-3 control-label">{{word[known][0] if multi else word[known]}}:</label>
-        <div class="col-sm-7">
-            <input type="text" name="read" class="form-control input-lg flasher" autocomplete="off">
+<div class="container">
+    {% for word in wordlist %}
+    <form class="read form-horizontal flasher" retries=0 >
+        <input type="hidden" name="answer" class="form-control" value="{{word[learning]}}">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">{{word[known][0] if multi else word[known]}}:</label>
+            <div class="col-sm-7">
+                <input type="text" name="read" class="form-control input-lg flasher" autocomplete="off">
+            </div>
+            <div class="three retries">
+                <span class="three">3x</span>
+                <span class="two">2x</span>
+                <button class="btn btn-lg btn-danger flasher">{{word[learning]}}</button>
+            </div>
+            <button type="submit" class="btn btn-lg btn-primary">Enter</button>
+            {% if multi %}
+                <ul class="col-sm-offset-3 list-inline alts">
+                    {% for alt in word[known][1:] %}
+                    <li><button class="btn btn-sm btn-default" type="button">{{alt}}</button></li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
         </div>
-        <div class="three retries">
-            <span class="three">3x</span>
-            <span class="two">2x</span>
-            <button class="btn btn-lg btn-danger flasher">{{word[learning]}}</button>
-        </div>
-        <button type="submit" class="btn btn-lg btn-primary">Enter</button>
-        {% if multi %}
-            <ul class="col-sm-offset-3 list-inline alts">
-                {% for alt in word[known][1:] %}
-                <li><button class="btn btn-sm btn-default" type="button">{{alt}}</button></li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </div>
-</form>
-{% endfor %}
+    </form>
+    {% endfor %}
+</div>
 
 {% endblock %}

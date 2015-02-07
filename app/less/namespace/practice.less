@@ -1,9 +1,25 @@
+@import "../vendor/lesshat-prefixed.less";
 body.practice {
+    nav {
+        border: none;
+        li.active a {
+            font-size: 1.2em;
+            &:hover {
+                font-size: 1.3em;
+            }
+        }
+        a {
+            .lh-transition( font-size 0.12s ease-in-out );
+            &:hover {
+                font-size: 1.2em;
+            }
+            &.navbar-brand:hover {
+                font-size: 1.5em;
+            }
+        }
+    }
     input.form-control {
         font-size: 2em;
-    }
-    form:not(.danger) .retries {
-        display: none;
     }
     .alts {
         margin-top: 0.5em;
@@ -23,16 +39,11 @@ body.practice {
         position: absolute;
         right: 18.5%;
         .three, .two {
-            display: none;
+            display : inline;
+            height : 100%;
             position: relative;
             top: 0.2em;
             font-size: 1.75em;
-        }
-        &.three {
-            .three {display : inline}
-        }
-        &.two {
-            .two {display : inline}
         }
         .btn-danger {
             border-width: 2px;

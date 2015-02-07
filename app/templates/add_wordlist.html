@@ -5,15 +5,17 @@
 
 {% block content %}
 
-<form method="POST" action="/create/wordlist" class="new-wordlist">
-    {{ input("name", "Name") }}
-    {{ input("from", "the language you know") }}
-    {{ input("to", "the language you're learning") }}
-    {{ input("delimiter", "character to split values by (default tab)") }}
-    {{ textarea("words", "known, learning, category") }}
-    <div class="form-group {{class}}">
-        <button type="submit" class="btn btn-lg btn-primary">Create List</button>
-    </div>
-</form>
+<div class="container">
+    <form method="POST" action="/create/wordlist" class="new-wordlist">
+        {{ input("name", "Name") }}
+        {{ input("from", "the language you know") }}
+        {{ input("to", "the language you're learning") }}
+        {{ input("delimiter", "character to split values by (default tab)") }}
+        {{ textarea("words", "known, learning, category") }}
+        <div class="form-group {{class}}">
+            <button type="submit" class="btn btn-lg btn-primary">Create List</button>
+        </div>
+    </form>
+</div>
 
 {% endblock %}

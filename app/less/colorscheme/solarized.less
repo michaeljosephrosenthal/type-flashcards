@@ -15,6 +15,42 @@
 @cyan   :  #2aa198;
 @green  :  #859900;
 body.cs-solarized {
+    nav {
+        background: @base03;
+        border: none;
+        li.active a {
+            background: @base02!important;
+            border-color: @base02;
+            font-size: 1.2em;
+            color: @blue!important;
+        }
+        a {
+            color: @violet!important;
+            &:hover {
+                background: darken(@base02, 1)!important;
+                font-size: 1.2em;
+
+            }
+            &.navbar-brand {
+                color: darken(@violet, 15)!important;
+            }
+        }
+    }
+
+    form.success {
+        background-color: @base03;
+        label {
+            color: @yellow
+        }
+        input {
+            background-color: @base03!important;
+            color: @cyan;
+        }
+    }
+
+    label.control-label {
+        color: @base0;
+    }
     input.form-control, textarea.form-control {
         background-color: @base03;
         color:  @base3;
