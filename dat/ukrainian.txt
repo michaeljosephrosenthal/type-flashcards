@@ -1,0 +1,30 @@
+arm;рука;n.
+back;спина;n.
+cheeks;щоки;n.
+chest;грудна клітина;n.
+chin;підборіддя;n.
+ear;вухо;n.
+elbow;лікоть;n.
+eye;око;n.
+face;обличчя;n.
+finger;палець;n.
+fingers;пальці;n.
+foot;ступня;n.
+hair;волосся;n.
+hand;долоня;n.
+head;голова;n.
+heart;серце;n.
+knee;коліно;n.
+leg;нога;n.
+lip;губа;n.
+mouth;рот;n.
+neck;шия;n.
+nose;ніс;n.
+shoulder;плече;n.
+stomach;живіт;n.
+teeth;зуби;n.
+thigh;стегно;n.
+throat;горло;n.
+thumb;великий палець;n.
+tongue;язик;n.
+tooth;зуб;n.

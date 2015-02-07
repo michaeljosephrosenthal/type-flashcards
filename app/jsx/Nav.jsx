@@ -21,6 +21,7 @@ var Nav = React.createClass({
                         <ul className="nav navbar-nav">
                             <NavItem href="/thai/to/eng" text="Thai to English" />
                             <NavItem href="/eng/to/thai" text="English to Thai" />
+                            <NavItem href="/ukr/to/eng" text="Ukrainian to English" />
                             <NavItem href="/create/wordlist" text="Create WordList" />
                         </ul>
                     </div>
