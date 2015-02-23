@@ -2,18 +2,11 @@ var React = require('react');
 
 var Retries = React.createClass({
     render: function() {
-        count = (4 - this.props.tries % 4) % 4;
-        if (count > 0) {
-            var span = "";
-            if (count == 3 ) {
-                span = <span className="three">3x</span>;
-            }
-            else if (count == 2 ) {
-                span = <span className="two">2x</span>;
-            }
+        count = 3 - this.props.correctTries;
+        if (this.props.wrongTries && count) {
             return (
                 <div className="retries">
-                    {span}
+                    { count > 1 ? <span className="count">{count}x</span> : "" }
                     <button className="btn btn-lg btn-danger flasher">{ this.props.learning }</button>
                 </div>
             );
@@ -24,17 +17,17 @@ var Retries = React.createClass({
 var Word = React.createClass({
     getInitialState: function() {
         return {
-            tries: 0,
-            attempted: false,
+            wrongTries: 0,
+            correctTries: 0,
             success: false,
-            stateClass: ""
+            stateClass: "",
+            guess: ""
         };
     },
     addSuccessScroll: function(){
         node = this.refs.form.getDOMNode();
         this.setState({
             success: true,
-            attempted: true,
             stateClass: "success"
         });
         flash("success");
@@ -45,35 +38,40 @@ var Word = React.createClass({
     },
     correctRetry: function(){
         this.setState({
-            tries: this.state.tries+1,
-            stateClass: "warning"
+            correctTries: this.state.correctTries + 1,
+            stateClass: "warning",
+            guess: ""
         });
-        this.refs.guess.getDOMNode().value = "";
         flash("warning");
     },
     wrong: function(){
-        tries = this.state.tries;
         this.setState({
-            tries: tries+1,
+            wrongTries: this.state.wrongTries + 1,
             success: false,
-            attempted: true,
-            stateClass: "danger"
+            stateClass: "danger",
+            guess: ""
         });
         flash("danger");
     },
     handleSubmit: function(event){
         event.preventDefault();
-        var answer  = this.refs.learning.getDOMNode().value.trim(),
-            guess   = this.refs.guess.getDOMNode().value.trim(),
-            tries   = this.state.tries;
+        var answer = this.props.learning,
+            guess  = this.state.guess,
+            correctTries  = this.state.correctTries;
+            wrongTries  = this.state.wrongTries;
         speak(answer);
-        if(tries % 3 === 0 && guess == answer){
+        if (guess == answer &&
+            (wrongTries === 0 ||
+             (this.state.correctTries - 2 === 0 ))) {
             this.addSuccessScroll();
         } else if (guess == answer){
             this.correctRetry();
         } else {
             this.wrong();
         }
+    },
+    handleGuessChange: function(event) {
+        this.setState({ guess: event.target.value });
     },
     render: function() {
         var tags = [];
@@ -89,13 +87,15 @@ var Word = React.createClass({
         return (
             <form className={"read form-horizontal flasher " + this.state.stateClass}
                   onSubmit={this.handleSubmit} ref="form">
-                <input type="hidden" ref="learning" className="form-control" value={this.props.learning}/>
                 <div className="form-group">
                     <label className="col-sm-3 control-label">{ ismulti ? this.props.known[0] : this.props.known }:</label>
                     <div className="col-sm-7">
-                        <input type="text" name="guess" ref="guess" className="form-control input-lg flasher" autoComplete="off" />
+                        <input type="text" name="guess" ref="guess" value={this.state.guess} onChange={this.handleGuessChange}
+                            className="form-control input-lg flasher" autoComplete="off" />
                     </div>
-                    <Retries tries={this.state.tries} learning={this.props.learning} />
+                    <Retries correctTries={this.state.correctTries}
+                        wrongTries={this.state.wrongTries}
+                        learning={this.props.learning} />
                     <button type="submit" className="btn btn-lg btn-primary">Enter</button>
                     {append}
                 </div>
