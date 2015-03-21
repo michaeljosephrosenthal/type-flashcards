@@ -26,7 +26,7 @@ def add_equal_wordlists(base_lang, category, **lang_to_lists):
 
 def load_words(thai_wordlist):
     wordset = set(thai_wordlist)
-    raw = open("../dat/volubilis.tsv", "r")
+    raw = open("./dat/volubilis.tsv", "r")
     volubilis = csv.DictReader(raw, delimiter='\t')
     for row in volubilis:
         if set(row["TH"].split('\xc2\xa0; ')) & wordset:
@@ -47,6 +47,6 @@ def import_words(listfile):
 if __name__ == "__main__":
     reload(sys)
     sys.setdefaultencoding('utf-8')
-    listfile = sys.argv[1]
-    print "importing words from " + listfile
-    import_words(listfile)
+    for listfile in sys.argv:
+        print "importing words from " + listfile
+        import_words(listfile)

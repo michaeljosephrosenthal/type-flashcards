@@ -6,8 +6,8 @@
 apt-get update
 apt-get upgrade
 apt-get install -y postgresql libpq-dev 
-apt-get install -y python-pip python-virtualenv python-dev git
+apt-get install -y python-pip python-virtualenv python-dev git vim
 
 # Setting up PostgreSQL database
-sudo -u postgres createdb type_flashcards -T template0 -E UTF8 --locale=en_US.UTF8
-echo "CREATE USER mjr;" | sudo -u postgres psql
+echo "CREATE USER vagrant WITH PASSWORD 'vagrant';" | sudo -u postgres psql
+bash /type-flashcards/vagrant/app.sh

@@ -5,3 +5,4 @@
 env/
 .c9/
 *.log
+vagrant/local/.vagrant/
