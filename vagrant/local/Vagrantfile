@@ -45,6 +45,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.synced_folder "../../", "/type-flashcards/"
 
   config.vm.provision :shell, :path => "../system.sh"
-  config.vm.provision :shell, :path => "../bottle.sh", :privileged => false
+  config.vm.provision :shell, :path => "../app.sh", :privileged => false
 
 end
