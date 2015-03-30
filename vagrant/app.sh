@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+sudo su vagrant
+cd ~
+
 virtualenv --python=python2.7 ~/venv
 pip install ipython honcho
 source ~/venv/bin/activate

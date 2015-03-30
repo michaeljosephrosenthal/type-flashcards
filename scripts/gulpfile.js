@@ -16,7 +16,7 @@ var app_root = '../app/jsx/app.js';
 var app_dest = 'app.js';
 var js_dir = '../app/assets/js/';
 
-var less_srcs = '../app/less/**/*less';
+var less_srcs = '../app/less/*less';
 var css_dir = '../app/assets/css/';
 
 gulp.task('compileLess', function() {
